@@ -262,7 +262,9 @@
                 console.log('JSON lookup response:', JSON.stringify(jsonData, null, 2));
                 
                 // The API returns data in ip_address_lookup array format
-                const data = jsonData.ip_address_lookup && jsonData.ip_address_lookup.length > 1 ? jsonData.ip_address_lookup[1] : {};
+                // Get the first (and likely only) element, or if there are two, get the second (the data)
+                const lookupArray = jsonData.ip_address_lookup || [];
+                const data = lookupArray.length === 1 ? lookupArray[0] : (lookupArray[1] || {});
                 
                 console.log('Parsed lookup data:', JSON.stringify(data, null, 2));
                 console.log('City value:', data.city);
