@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>URL Encoder / Decoder</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background-color: #ffffff;
+      color: #434343;
+      line-height: 1.5;
+      padding: 30px 20px;
+    }
+    h1 {
+      text-align: center;
+      font-size: 1.6em;
+      font-weight: 700;
+      color: #fe0032;
+      margin-bottom: 20px;
+      text-transform: lowercase;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    textarea {
+      width: 100%;
+      height: 140px;
+      padding: 12px;
+      border: 1px solid #434343;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 0.95em;
+      color: #434343;
+      background-color: #ffffff;
+      margin-bottom: 20px;
+    }
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    button {
+      padding: 10px 16px;
+      font-family: 'Roboto', sans-serif;
+      font-size: 13px;
+      font-weight: 400;
+      text-transform: lowercase;
+      background-color: #ffffff;
+      color: #434343;
+      border: 1px solid #434343;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    button:hover {
+      border-color: #fe0032;
+    }
+    button:active {
+      transform: scale(0.98);
+    }
+    .toast {
+      position: fixed;
+      top: 80px;
+      left: 50%;
+      transform: translateX(-50%) scale(0.9);
+      background-color: #fe0032;
+      color: #ffffff;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 14px;
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      z-index: 1000;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) scale(1);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>url encoder / decoder</h1>
+
+    <textarea id="input" placeholder="enter text here..."></textarea>
+
+    <div class="button-group">
+      <button onclick="encodeURIComp()">encodeURI</button>
+      <button onclick="decodeURIComp()">decodeURI</button>
+      <button onclick="base64Encode()">base64 encode</button>
+      <button onclick="base64Decode()">base64 decode</button>
+      <button onclick="htmlEscape()">html escape</button>
+      <button onclick="htmlUnescape()">html unescape</button>
+    </div>
+
+    <textarea id="output" placeholder="output will appear here..." readonly></textarea>
+
+    <div class="button-group">
+      <button onclick="clearFields()">clear</button>
+      <button onclick="copyOutput()">copy output</button>
+    </div>
+
+    <div class="toast" id="toast">copied to clipboard!</div>
+  </div>
+
+  <script>
+    const input = document.getElementById('input');
+    const output = document.getElementById('output');
+    const toast = document.getElementById('toast');
+
+    function encodeURIComp() {
+      try {
+        output.value = encodeURIComponent(input.value);
+      } catch (e) {
+        output.value = 'Error encoding text';
+      }
+    }
+
+    function decodeURIComp() {
+      try {
+        output.value = decodeURIComponent(input.value);
+      } catch (e) {
+        output.value = 'Error decoding text';
+      }
+    }
+
+    function base64Encode() {
+      try {
+        output.value = btoa(input.value);
+      } catch (e) {
+        output.value = 'Error encoding Base64';
+      }
+    }
+
+    function base64Decode() {
+      try {
+        output.value = atob(input.value);
+      } catch (e) {
+        output.value = 'Error decoding Base64';
+      }
+    }
+
+    function htmlEscape() {
+      output.value = input.value
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function htmlUnescape() {
+      output.value = input.value
+        .replace(/&lt;/g, '<')
+        .replace(/&gt;/g, '>')
+        .replace(/&quot;/g, '"')
+        .replace(/&#39;/g, "'")
+        .replace(/&amp;/g, '&');
+    }
+
+    function clearFields() {
+      input.value = '';
+      output.value = '';
+    }
+
+    function copyOutput() {
+      navigator.clipboard.writeText(output.value).then(() => {
+        showToast();
+      });
+    }
+
+    function showToast() {
+      toast.classList.add('show');
+      setTimeout(() => toast.classList.remove('show'), 2000);
+    }
+  </script>
+</body>
+</html>
