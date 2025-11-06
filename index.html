@@ -417,15 +417,19 @@
                 }
                 
                 const proxyText = await response.text();
-                console.log('Proxy check response:', proxyText);
+                console.log('Proxy check raw response:', proxyText);
                 
                 const proxyData = {};
                 
                 // Parse plain text response: "ip:xxx is_proxy:yes proxy_type:VPN tor_node:no"
-                const parts = proxyText.split(' ');
+                const parts = proxyText.trim().split(/\s+/);
+                console.log('Proxy check parts:', parts);
+                
                 parts.forEach(part => {
-                    const [key, value] = part.split(':');
-                    if (key && value) {
+                    const colonIndex = part.indexOf(':');
+                    if (colonIndex !== -1) {
+                        const key = part.substring(0, colonIndex);
+                        const value = part.substring(colonIndex + 1);
                         proxyData[key] = value;
                     }
                 });
