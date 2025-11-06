@@ -28,6 +28,13 @@
       margin: 20px auto;
       padding: 0 20px;
     }
+    .section-title {
+      color: #fe0032;
+      font-size: 1.15em;
+      font-weight: 700;
+      margin-bottom: 15px;
+      text-transform: lowercase;
+    }
     select {
       width: 100%;
       padding: 12px 16px;
@@ -62,7 +69,7 @@
       gap: 12px;
       margin-bottom: 20px;
       flex-wrap: wrap;
-      justify-content: center;
+      justify-content: flex-start;
     }
     button {
       padding: 10px 16px;
@@ -113,22 +120,28 @@
   </div>
 
   <div class="container">
-    <select id="encodeType" onchange="processEncode()">
-      <option value="">select encoding type...</option>
-      <option value="encodeURI">encode URI</option>
-      <option value="decodeURI">decode URI</option>
-      <option value="base64Encode">base64 encode</option>
-      <option value="base64Decode">base64 decode</option>
-      <option value="hexEncode">hex encode</option>
-      <option value="hexDecode">hex decode</option>
-      <option value="binaryEncode">binary encode</option>
-      <option value="binaryDecode">binary decode</option>
-      <option value="md5Hash">MD5 hash</option>
-      <option value="sha256Hash">SHA-256 hash</option>
-    </select>
+    <div class="section-title">select encoding type</div>
 
 ```
+<select id="encodeType">
+  <option value="">select encoding type...</option>
+  <option value="encodeURI">encode URI</option>
+  <option value="decodeURI">decode URI</option>
+  <option value="base64Encode">base64 encode</option>
+  <option value="base64Decode">base64 decode</option>
+  <option value="hexEncode">hex encode</option>
+  <option value="hexDecode">hex decode</option>
+  <option value="binaryEncode">binary encode</option>
+  <option value="binaryDecode">binary decode</option>
+  <option value="md5Hash">MD5 hash</option>
+  <option value="sha256Hash">SHA-256 hash</option>
+</select>
+
 <textarea id="input" placeholder="enter text here..."></textarea>
+
+<div class="button-group">
+  <button onclick="processEncode()">go</button>
+</div>
 
 <textarea id="output" placeholder="output will appear here..." readonly></textarea>
 
