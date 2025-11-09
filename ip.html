@@ -264,75 +264,7 @@
     
     const API_KEY = '25463b02f43f7899916d89b8eb4043ec';
     let allData = {};
-    /**
- * Helper function to convert an IPv4 address string to a 32-bit unsigned integer.
- * @param {string} ip - The IPv4 address (e.g., "192.168.1.1").
- * @returns {number} The 32-bit integer representation.
- */
-function ipToNum(ip) {
-    if (!ip) return 0;
-    // The >>> 0 ensures the result is a 32-bit unsigned integer
-    return ip.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet, 10), 0) >>> 0;
-}
-
-/**
- * Helper function to convert a 32-bit unsigned integer back to an IPv4 string.
- * @param {number} num - The 32-bit integer representation.
- * @returns {string} The IPv4 address string.
- */
-function numToIp(num) {
-    return [
-        (num >>> 24) & 0xFF,
-        (num >>> 16) & 0xFF,
-        (num >>> 8) & 0xFF,
-        num & 0xFF
-    ].join('.');
-}
-
-/**
- * Calculates the smallest single CIDR block that fully encompasses the given IP range.
- * @param {string} startIP - The start IP address of the range.
- * @param {string} endIP - The end IP address of the range.
- * @returns {string} The CIDR notation (e.g., "1.2.3.0/24").
- */
-function calculateCIDRFromRange(startIP, endIP) {
-    if (!startIP || !endIP) return 'n/a';
     
-    const startNum = ipToNum(startIP);
-    const endNum = ipToNum(endIP);
-
-    if (startNum > endNum) return 'Invalid Range';
-
-    // We iterate from /32 downwards to find the smallest prefix 'p'
-    // such that the block defined by startNum/p contains the endNum.
-    let smallestEncompassingPrefix = 32;
-    for (let p = 32; p >= 0; p--) {
-        const bits = 32 - p;
-        const hostMask = (1 << bits) - 1; // Mask for host bits
-
-        // Calculate the network address for this prefix 'p' based on the start IP
-        const network = startNum & (~hostMask);
-
-        // Calculate the broadcast address for this prefix 'p'
-        const broadcast = network | hostMask;
-        
-        // Check if the calculated block [network, broadcast] contains the entire input range
-        if (network <= startNum && broadcast >= endNum) {
-            smallestEncompassingPrefix = p;
-        } else {
-            // Once the condition breaks, the previous prefix was the smallest encompassing one.
-            break;
-        }
-    }
-    
-    // Now calculate the final Network Address for the smallestEncompassingPrefix
-    const finalBits = 32 - smallestEncompassingPrefix;
-    const finalHostMask = (1 << finalBits) - 1;
-    const finalNetworkAddressNum = startNum & (~finalHostMask);
-    const finalNetworkAddress = numToIp(finalNetworkAddressNum);
-    
-    return `${finalNetworkAddress}/${smallestEncompassingPrefix}`;
-}
     async function getIPAddress() {
         try {
             const response = await fetch(`https://api.whatismyip.com/ip.php?key=${API_KEY}`);
@@ -443,42 +375,37 @@ function calculateCIDRFromRange(startIP, endIP) {
     
     
     async function getWhois(ip) {
-    try {
-        const whois = await fetchWithRetry(`https://api.whatismyip.com/whois.php?key=${API_KEY}&input=${ip}`, 3);
-        if (!whois) return;
-
-        document.getElementById('whoisText').textContent = whois;
-        
-        // Try to extract IP range from WHOIS data (e.g., 1.2.3.4 - 1.2.3.255)
-        const rangeMatch = whois.match(/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\s*-\s*(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/);
-        
-        // Update ASN from WHOIS if IP lookup didn't provide it
-        const asnElement = document.getElementById('asn');
-        if (asnElement.textContent.includes('loading')) {
-            const asnMatch = whois.match(/AS\d+/);
-            if (asnMatch) {
-                asnElement.textContent = asnMatch[0];
-            }
-        }
-
-        if (rangeMatch) {
-            const startIP = rangeMatch[1];
-            const endIP = rangeMatch[2];
+        try {
+            const response = await fetch(`https://api.whatismyip.com/whois.php?key=${API_KEY}&input=${ip}`);
             
-            // Calculate and display the network range in CIDR format
-            const cidrRange = calculateCIDRFromRange(startIP, endIP);
-            document.getElementById('asnRange').textContent = cidrRange;
-        } else {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const whois = await response.text();
+            document.getElementById('whoisText').textContent = whois;
+            
+            // Try to extract ASN and range from WHOIS data
+            const asnMatch = whois.match(/AS\d+/);
+            const rangeMatch = whois.match(/(\d+\.\d+\.\d+\.\d+)\s*-\s*(\d+\.\d+\.\d+\.\d+)/);
+            
+            if (asnMatch && !document.getElementById('asn').textContent.includes('loading')) {
+                document.getElementById('asn').textContent = asnMatch[0];
+            }
+            if (rangeMatch) {
+                document.getElementById('asnRange').textContent = `${rangeMatch[1]} - ${rangeMatch[2]}`;
+            } else {
+                document.getElementById('asnRange').textContent = 'n/a';
+            }
+            
+            allData.whois = whois;
+        } catch (error) {
+            console.error('Error fetching WHOIS:', error);
+            document.getElementById('whoisText').textContent = 'error loading whois data';
+            document.getElementById('asnOrganization').textContent = 'n/a';
             document.getElementById('asnRange').textContent = 'n/a';
         }
-        
-        allData.whois = whois;
-    } catch (error) {
-        console.error('Error fetching WHOIS:', error);
-        document.getElementById('whoisText').textContent = 'error loading whois data';
-        document.getElementById('asnRange').textContent = 'n/a';
     }
-}
     
     
     function convertRangeToCIDR(startIP, endIP) {
