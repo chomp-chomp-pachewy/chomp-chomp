@@ -388,13 +388,13 @@ async function getWhois(ip) {
         // Replace the ARIN reporting text with a link
 whois = whois.replace(
     /please report at[\s\n]*#[\s\n]*https:\/\/www\.arin\.net\/resources\/registry\/whois\/inaccuracy_reporting\//g,
-    '<a href="https://www.arin.net/resources/registry/whois/inaccuracy_reporting/">please report</a>'
+    'please <a href="https://www.arin.net/resources/registry/whois/inaccuracy_reporting/">report</a> them.'
 );
 
 // Replace the Terms of Use text with a link
 whois = whois.replace(
     /subject to the Terms of Use[\s\n]*#[\s\n]*available at:\s*https:\/\/www\.arin\.net\/resources\/registry\/whois\/tou\//g,
-    'subject to the <a href="https://www.arin.net/resources/registry/whois/tou/">Terms of Use</a>'
+    'subject to the <a href="https://www.arin.net/resources/registry/whois/tou/">Terms of Use</a>.'
 );
         
         document.getElementById('whoisText').innerHTML = whois; // Changed from textContent to innerHTML
