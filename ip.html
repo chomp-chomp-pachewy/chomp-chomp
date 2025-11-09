@@ -410,7 +410,6 @@ async function getWhois(ip) {
     } catch (error) {
         console.error('Error fetching WHOIS:', error);
         document.getElementById('whoisText').textContent = 'error loading whois data';
-        document.getElementById('asnOrganization').textContent = 'n/a';
         document.getElementById('asnRange').textContent = 'n/a';
     }
 }
