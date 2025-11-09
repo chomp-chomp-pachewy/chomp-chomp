@@ -374,39 +374,46 @@
     }
     
     
-    async function getWhois(ip) {
-        try {
-            const response = await fetch(`https://api.whatismyip.com/whois.php?key=${API_KEY}&input=${ip}`);
-            
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            
-            const whois = await response.text();
-            document.getElementById('whoisText').textContent = whois;
-            
-            // Try to extract ASN and range from WHOIS data
-            const asnMatch = whois.match(/AS\d+/);
-            const rangeMatch = whois.match(/(\d+\.\d+\.\d+\.\d+)\s*-\s*(\d+\.\d+\.\d+\.\d+)/);
-            
-            if (asnMatch && !document.getElementById('asn').textContent.includes('loading')) {
-                document.getElementById('asn').textContent = asnMatch[0];
-            }
-            if (rangeMatch) {
-                document.getElementById('asnRange').textContent = `${rangeMatch[1]} - ${rangeMatch[2]}`;
-            } else {
-                document.getElementById('asnRange').textContent = 'n/a';
-            }
-            
-            allData.whois = whois;
-        } catch (error) {
-            console.error('Error fetching WHOIS:', error);
-            document.getElementById('whoisText').textContent = 'error loading whois data';
-            document.getElementById('asnOrganization').textContent = 'n/a';
+
+async function getWhois(ip) {
+    try {
+        const response = await fetch(`https://api.whatismyip.com/whois.php?key=${API_KEY}&input=${ip}`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        
+        let whois = await response.text();
+        
+        // Replace the ARIN reporting text with a link
+        whois = whois.replace(
+            /please report at[\s\n]*#[\s\n]*https:\/\/www\.arin\.net\/resources\/registry\/whois\/inaccuracy_reporting\//g,
+            '<a href="https://www.arin.net/resources/registry/whois/inaccuracy_reporting/">please report</a>'
+        );
+        
+        document.getElementById('whoisText').innerHTML = whois; // Changed from textContent to innerHTML
+        
+        // Try to extract ASN and range from WHOIS data
+        const asnMatch = whois.match(/AS\d+/);
+        const rangeMatch = whois.match(/(\d+\.\d+\.\d+\.\d+)\s*-\s*(\d+\.\d+\.\d+\.\d+)/);
+        
+        if (asnMatch && !document.getElementById('asn').textContent.includes('loading')) {
+            document.getElementById('asn').textContent = asnMatch[0];
+        }
+        if (rangeMatch) {
+            document.getElementById('asnRange').textContent = `${rangeMatch[1]} - ${rangeMatch[2]}`;
+        } else {
             document.getElementById('asnRange').textContent = 'n/a';
         }
+        
+        allData.whois = whois;
+    } catch (error) {
+        console.error('Error fetching WHOIS:', error);
+        document.getElementById('whoisText').textContent = 'error loading whois data';
+        document.getElementById('asnOrganization').textContent = 'n/a';
+        document.getElementById('asnRange').textContent = 'n/a';
     }
-    
+}
     
     function convertRangeToCIDR(startIP, endIP) {
         // Simple conversion for common cases
