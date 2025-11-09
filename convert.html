@@ -405,124 +405,156 @@
 
     let converting = false;
 
-    function updateUnits() {
-        const type = document.getElementById('conversionType').value;
-        const unit1 = document.getElementById('unit1');
-        const unit2 = document.getElementById('unit2');
-        
-        unit1.innerHTML = '';
-        unit2.innerHTML = '';
-        
-        const units = Object.keys(conversions[type].units);
-        units.forEach(unit => {
-            unit1.add(new Option(unit, unit));
-            unit2.add(new Option(unit, unit));
-        });
-        
-        if (units.length > 1) {
-            unit2.selectedIndex = 1;
-        }
-        
-        document.getElementById('value1').value = '';
-        document.getElementById('value2').value = '';
-        
-        updateFormula();
+// Placeholder for initTheme (was called but not defined in original code)
+function initTheme() {
+    // Theme initialization logic would go here
+}
+
+// MODIFICATION: This function ONLY populates the unit lists
+function updateUnits() {
+    const type = document.getElementById(&#39;conversionType&#39;).value;
+    const unit1 = document.getElementById(&#39;unit1&#39;);
+    const unit2 = document.getElementById(&#39;unit2&#39;);
+    
+    unit1.innerHTML = &#39;&#39;;
+    unit2.innerHTML = &#39;&#39;;
+    
+    const units = Object.keys(conversions[type].units);
+    units.forEach(unit =&gt; {
+        unit1.add(new Option(unit, unit));
+        unit2.add(new Option(unit, unit));
+    });
+}
+
+// NEW FUNCTION to handle the &quot;onchange&quot; event
+function handleTypeChange() {
+    updateUnits(); // 1. Populate the lists
+
+    // 2. Set default units for the new type (e.g., Meter and Kilometer)
+    if (Object.keys(conversions[document.getElementById(&#39;conversionType&#39;).value].units).length &gt; 1) {
+        document.getElementById(&#39;unit1&#39;).selectedIndex = 0;
+        document.getElementById(&#39;unit2&#39;).selectedIndex = 1; 
     }
 
-    function convert(source) {
-        if (converting) return;
-        converting = true;
-        
-        const type = document.getElementById('conversionType').value;
-        const value1 = parseFloat(document.getElementById('value1').value);
-        const value2 = parseFloat(document.getElementById('value2').value);
-        const unit1 = document.getElementById('unit1').value;
-        const unit2 = document.getElementById('unit2').value;
-        
-        if (source === 1 && !isNaN(value1)) {
-            let result;
-            if (conversions[type].convert) {
-                result = conversions[type].convert(value1, unit1, unit2);
-            } else {
-                const baseValue = value1 / conversions[type].units[unit1];
-                result = baseValue * conversions[type].units[unit2];
-            }
-            document.getElementById('value2').value = result.toFixed(6);
-        } else if (source === 2 && !isNaN(value2)) {
-            let result;
-            if (conversions[type].convert) {
-                result = conversions[type].convert(value2, unit2, unit1);
-            } else {
-                const baseValue = value2 / conversions[type].units[unit2];
-                result = baseValue * conversions[type].units[unit1];
-            }
-            document.getElementById('value1').value = result.toFixed(6);
-        }
-        
-        updateFormula();
-        converting = false;
-    }
+    // 3. Clear values and update formula
+    clearAll();
+}
 
-    function updateFormula() {
-        const type = document.getElementById('conversionType').value;
-        const unit1 = document.getElementById('unit1').value;
-        const unit2 = document.getElementById('unit2').value;
-        const formulaText = document.getElementById('formulaText');
-        
+
+function convert(source) {
+    if (converting) return;
+    converting = true;
+    
+    const type = document.getElementById(&#39;conversionType&#39;).value;
+    const value1 = parseFloat(document.getElementById(&#39;value1&#39;).value);
+    const value2 = parseFloat(document.getElementById(&#39;value2&#39;).value);
+    const unit1 = document.getElementById(&#39;unit1&#39;).value;
+    const unit2 = document.getElementById(&#39;unit2&#39;).value;
+    
+    if (source === 1 &amp;&amp; !isNaN(value1)) {
+        let result;
         if (conversions[type].convert) {
-            if (type === 'temperature') {
-                if (unit1 === 'Celsius' && unit2 === 'Fahrenheit') {
-                    formulaText.textContent = 'multiply by 9/5 and add 32';
-                } else if (unit1 === 'Fahrenheit' && unit2 === 'Celsius') {
-                    formulaText.textContent = 'subtract 32 and multiply by 5/9';
-                } else if (unit1 === 'Celsius' && unit2 === 'Kelvin') {
-                    formulaText.textContent = 'add 273.15';
-                } else if (unit1 === 'Kelvin' && unit2 === 'Celsius') {
-                    formulaText.textContent = 'subtract 273.15';
-                } else if (unit1 === 'Fahrenheit' && unit2 === 'Kelvin') {
-                    formulaText.textContent = 'subtract 32, multiply by 5/9, then add 273.15';
-                } else if (unit1 === 'Kelvin' && unit2 === 'Fahrenheit') {
-                    formulaText.textContent = 'subtract 273.15, multiply by 9/5, then add 32';
-                } else {
-                    formulaText.textContent = 'same unit, no conversion needed';
-                }
-            } else if (type === 'ring') {
-                formulaText.textContent = `convert ${unit1.toLowerCase()} to diameter (mm), then convert to ${unit2.toLowerCase()}`;
-            } else if (type === 'shoes') {
-                formulaText.textContent = `convert ${unit1.toLowerCase()} to centimeters, then convert to ${unit2.toLowerCase()}`;
-            }
+            result = conversions[type].convert(value1, unit1, unit2);
         } else {
-            const factor = conversions[type].units[unit2] / conversions[type].units[unit1];
-            formulaText.textContent = `multiply the ${type} value by ${factor.toFixed(6)}`;
+            const baseValue = value1 / conversions[type].units[unit1];
+            result = baseValue * conversions[type].units[unit2];
+        }
+        document.getElementById(&#39;value2&#39;).value = result.toFixed(6);
+    } else if (source === 2 &amp;&amp; !isNaN(value2)) {
+        let result;
+        if (conversions[type].convert) {
+            result = conversions[type].convert(value2, unit2, unit1);
+        } else {
+            const baseValue = value2 / conversions[type].units[unit2];
+            result = baseValue * conversions[type].units[unit1];
+        }
+        document.getElementById(&#39;value1&#39;).value = result.toFixed(6);
+    } else {
+        // Clear the other value if the input is cleared
+        if (source === 1) {
+            document.getElementById(&#39;value2&#39;).value = &#39;&#39;;
+        } else if (source === 2) {
+            document.getElementById(&#39;value1&#39;).value = &#39;&#39;;
         }
     }
+    
+    updateFormula();
+    converting = false;
+}
 
-    function clearAll() {
-        document.getElementById('value1').value = '';
-        document.getElementById('value2').value = '';
-        updateFormula();
+function updateFormula() {
+    const type = document.getElementById(&#39;conversionType&#39;).value;
+    const unit1 = document.getElementById(&#39;unit1&#39;).value;
+    const unit2 = document.getElementById(&#39;unit2&#39;).value;
+    const formulaText = document.getElementById(&#39;formulaText&#39;);
+
+    // Handle case where units might not be populated yet
+    if (!unit1 || !unit2) {
+        formulaText.textContent = &#39;...&#39;;
+        return;
     }
-
-   // Function to set the initial state explicitly
-    function initializeConverter() {
-        initTheme();
-
-        // 1. Ensure 'length' is selected as the conversion type
-        document.getElementById('conversionType').value = 'length';
+    
+    if (conversions[type].convert) {
+        if (type === &#39;temperature&#39;) {
+            if (unit1 === &#39;Celsius&#39; &amp;&amp; unit2 === &#39;Fahrenheit&#39;) {
+                formulaText.textContent = &#39;multiply by 9/5 and add 32&#39;;
+            } else if (unit1 === &#39;Fahrenheit&#39; &amp;&amp; unit2 === &#39;Celsius&#39;) {
+                formulaText.textContent = &#39;subtract 32 and multiply by 5/9&#39;;
+            } else if (unit1 === &#39;Celsius&#39; &amp;&amp; unit2 === &#39;Kelvin&#39;) {
+                formulaText.textContent = &#39;add 273.15&#39;;
+            } else if (unit1 === &#39;Kelvin&#39; &amp;&amp; unit2 === &#39;Celsius&#39;) {
+                formulaText.textContent = &#39;subtract 273.15&#39;;
+            } else if (unit1 === &#39;Fahrenheit&#39; &amp;&amp; unit2 === &#39;Kelvin&#39;) {
+                formulaText.textContent = &#39;subtract 32, multiply by 5/9, then add 273.15&#39;;
+            } else if (unit1 === &#39;Kelvin&#39; &amp;&amp; unit2 === &#39;Fahrenheit&#39;) {
+                formulaText.textContent = &#39;subtract 273.15, multiply by 9/5, then add 32&#39;;
+            } else {
+                formulaText.textContent = &#39;same unit, no conversion needed&#39;;
+            }
+        } else if (type === &#39;ring&#39;) {
+            formulaText.textContent = `convert ${unit1.toLowerCase()} to diameter (mm), then convert to ${unit2.toLowerCase()}`;
+        } else if (type === &#39;shoes&#39;) {
+            formulaText.textContent = `convert ${unit1.toLowerCase()} to centimeters, then convert to ${unit2.toLowerCase()}`;
+        }
+    } else {
+        // General multiplication conversion formula
+        const baseUnitFactor1 = conversions[type].units[unit1];
+        const targetUnitFactor2 = conversions[type].units[unit2];
         
-        // 2. Load the units for the selected type (re-populates the select lists)
-        updateUnits(); 
-        
-        // 3. Explicitly set the desired units (Inch and Centimeter)
-        document.getElementById('unit1').value = 'Inch';
-        document.getElementById('unit2').value = 'Centimeter';
-        
-        // 4. Update the formula display for the final selections
-        updateFormula();
+        // Formula is: value_2 = value_1 / factor_1 * factor_2
+        // Which simplifies to: value_2 = value_1 * (factor_2 / factor_1)
+        const factor = targetUnitFactor2 / baseUnitFactor1;
+        formulaText.textContent = `multiply the ${unit1.toLowerCase()} value by ${factor.toFixed(6)}`;
     }
+}
 
-    // Call the new initialization function when the script loads
-    initializeConverter();
+function clearAll() {
+    document.getElementById(&#39;value1&#39;).value = &#39;&#39;;
+    document.getElementById(&#39;value2&#39;).value = &#39;&#39;;
+    updateFormula();
+}
+
+
+// Function to set the initial state explicitly
+function initializeConverter() {
+    initTheme();
+
+    // 1. Ensure &#39;length&#39; is selected as the conversion type
+    document.getElementById(&#39;conversionType&#39;).value = &#39;length&#39;;
+    
+    // 2. Load the units for the selected type (re-populates the select lists)
+    updateUnits(); 
+    
+    // 3. Explicitly set the desired units (Inch and Centimeter)
+    document.getElementById(&#39;unit1&#39;).value = &#39;Inch&#39;;
+    document.getElementById(&#39;unit2&#39;).value = &#39;Centimeter&#39;;
+    
+    // 4. Update the formula display for the final selections
+    updateFormula();
+}
+
+// Call the new initialization function when the script loads
+initializeConverter();
     
 </script>
 
