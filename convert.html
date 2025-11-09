@@ -503,17 +503,26 @@
         updateFormula();
     }
 
+   // Function to set the initial state explicitly
+    function initializeConverter() {
+        initTheme();
 
-    // *** MODIFIED INITIALIZATION LOGIC ***
-    initTheme();
-    updateUnits(); // Step 1: Initialize units for 'length' (default in HTML)
+        // 1. Ensure 'length' is selected as the conversion type
+        document.getElementById('conversionType').value = 'length';
+        
+        // 2. Load the units for the selected type (re-populates the select lists)
+        updateUnits(); 
+        
+        // 3. Explicitly set the desired units (Inch and Centimeter)
+        document.getElementById('unit1').value = 'Inch';
+        document.getElementById('unit2').value = 'Centimeter';
+        
+        // 4. Update the formula display for the final selections
+        updateFormula();
+    }
 
-    // Step 2: Set the requested default units
-    document.getElementById('unit1').value = 'Inch';
-    document.getElementById('unit2').value = 'Centimeter';
-    
-    // Step 3: Update the formula display for the final selection
-    updateFormula();
+    // Call the new initialization function when the script loads
+    initializeConverter();
     
 </script>
 
