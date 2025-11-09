@@ -337,10 +337,29 @@
             
             // Coordinates
             if (data.latitude && data.longitude) {
-                document.getElementById('coordinates').textContent = `${data.latitude}, ${data.longitude}`;
-            } else {
-                document.getElementById('coordinates').textContent = 'n/a';
-            }
+    const latitude = data.latitude;
+    const longitude = data.longitude;
+
+    // 1. Create the link element
+    const mapLink = document.createElement('a');
+
+    // 2. Set the href attribute using the coordinates
+    // Using a standard Google Maps link format for better compatibility:
+    mapLink.href = `https://www.google.com/maps/search/?api=1&query=${latitude},${longitude}`;
+
+    // 3. Set the visible text of the link
+    mapLink.textContent = `${latitude}, ${longitude}`;
+
+    // 4. Get the target container element
+    const coordinatesDisplay = document.getElementById('coordinates');
+
+    // 5. Clear any existing content and append the new link
+    coordinatesDisplay.innerHTML = ''; // Clear 'n/a' or previous content
+    coordinatesDisplay.appendChild(mapLink);
+
+} else {
+    document.getElementById('coordinates').textContent = 'n/a';
+}
             
             // Calculate local time from timezone offset
             if (data.time) {
