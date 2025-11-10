@@ -394,8 +394,8 @@
             
             <div id="subnetResults" class="results" style="display: none;"></div>
 
-            <div class="input-row-two">
-  <button class="btn" onclick="copyAllSubnetInfo()">copy all results</button>
+<div class="input-row-two">
+  <button class="btn" onclick="copyAllSubnetResults()">copy all results</button>
 </div>
 
             <div class="clear-link">
@@ -802,31 +802,44 @@ function clearCIDR() {
             if (e.key === 'Enter') calcCIDR();
         });
 
-function copyAllSubnetInfo() {
-  // Collect all info-section text blocks
-  const sections = document.querySelectorAll('.info-section');
-  if (!sections.length) {
-    alert('No results to copy yet.');
-    return;
-  }
+function copyAllSubnetResults() {
+    const resultsDiv = document.getElementById('subnetResults');
+    if (!resultsDiv || resultsDiv.style.display === 'none') {
+        alert('No subnet results to copy.');
+        return;
+    }
 
-  let output = '';
+    let output = '';
 
-  sections.forEach(section => {
-    const title = section.querySelector('strong')?.innerText || '';
-    const content = section.innerText.replace(title, '').trim();
+    // Grab each result section
+    const sections = resultsDiv.querySelectorAll('.result-section, .result-grid');
 
-    output += `${title}\n${content}\n\n`;
-  });
+    sections.forEach(section => {
+        // If it has a header (like h3), use it as section title
+        const header = section.querySelector('h3');
+        if (header) output += header.innerText + '\n';
 
-  // Copy to clipboard
-  navigator.clipboard.writeText(output).then(() => {
-    alert('All subnet results copied to clipboard.');
-  }).catch(err => {
-    console.error('Copy failed', err);
-    alert('Unable to copy results.');
-  });
+        // Grab all label/value pairs
+        const items = section.querySelectorAll('.result-item, .result-box');
+        items.forEach(item => {
+            const label = item.querySelector('.result-label, .result-box-label')?.innerText || '';
+            const value = item.querySelector('.result-value, .result-box-value span')?.innerText || '';
+            if (label && value) output += `${label}: ${value}\n`;
+        });
+
+        output += '\n'; // add spacing between sections
+    });
+
+    // Copy to clipboard
+    navigator.clipboard.writeText(output).then(() => {
+        showToast('All subnet results copied to clipboard.');
+    }).catch(err => {
+        console.error('Copy failed', err);
+        showToast('Unable to copy results.');
+    });
 }
+
+        
         
     </script>
 </body>
