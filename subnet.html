@@ -394,6 +394,10 @@
             
             <div id="subnetResults" class="results" style="display: none;"></div>
 
+            <div class="input-row-two">
+  <button class="btn" onclick="copyAllSubnetInfo()">copy all results</button>
+</div>
+
             <div class="clear-link">
                 <a onclick="clearSubnet()">clear all values</a>
             </div>
@@ -797,6 +801,33 @@ function clearCIDR() {
         document.getElementById('endIp').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') calcCIDR();
         });
+
+function copyAllSubnetInfo() {
+  // Collect all info-section text blocks
+  const sections = document.querySelectorAll('.info-section');
+  if (!sections.length) {
+    alert('No results to copy yet.');
+    return;
+  }
+
+  let output = '';
+
+  sections.forEach(section => {
+    const title = section.querySelector('strong')?.innerText || '';
+    const content = section.innerText.replace(title, '').trim();
+
+    output += `${title}\n${content}\n\n`;
+  });
+
+  // Copy to clipboard
+  navigator.clipboard.writeText(output).then(() => {
+    alert('All subnet results copied to clipboard.');
+  }).catch(err => {
+    console.error('Copy failed', err);
+    alert('Unable to copy results.');
+  });
+}
+        
     </script>
 </body>
 </html>
