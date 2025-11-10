@@ -54,14 +54,14 @@
         .section {
             margin-bottom: 60px;
         }
-
-        .section-title {
-            font-weight: 400;
-            color: #666666;
-            font-size: 1em;
-            text-transform: lowercase;
-            margin-bottom: 20px;
-        }
+        
+    .section-title {
+      color: #fe0032;
+      font-size: 1.15em;
+      font-weight: 700;
+      margin-bottom: 15px;
+      text-transform: lowercase;
+    }
 
         .form-group {
             margin-bottom: 20px;
@@ -402,8 +402,8 @@
         <div class="divider"></div>
 
 <!-- CIDR Calculator -->
-<section id="cidr-section">
-  <h2>CIDR Range Calculator</h2>
+<section id="cidr-section" class="calc-section">
+  <div class="section-title">CIDR Range Calculator</div>
 
   <div class="form-group">
     <label for="startIp">Start IP Address</label>
@@ -415,12 +415,14 @@
     <input type="text" id="endIp" placeholder="e.g., 192.168.0.255" />
   </div>
 
-  <button onclick="calcCIDR()">Calculate</button>
-  <button onclick="clearCIDR()">Clear</button>
+  <div class="button-row">
+    <button class="primary-btn" onclick="calcCIDR()">Calculate</button>
+    <button class="clear-btn" onclick="clearCIDR()">Clear All Values</button>
+  </div>
 
   <div id="cidrError" class="error-message" style="display:none;"></div>
 
-  <div id="cidrResults" style="display:none;">
+  <div id="cidrResults" class="results-card" style="display:none;">
     <h3>Results</h3>
     <div id="cidrOutput"></div>
   </div>
