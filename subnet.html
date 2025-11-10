@@ -494,6 +494,23 @@
             return false;
         }
 
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('copied to clipboard');
+            }).catch(err => {
+                showToast('failed to copy');
+            });
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+
         // SUBNET CALCULATOR
         function calcSubnet() {
             const input = document.getElementById('ipAddress').value.trim();
@@ -504,7 +521,6 @@
             errorDiv.style.display = 'none';
             resultsDiv.style.display = 'none';
 
-            // Parse input
             let ip, prefix;
             if (input.includes('/')) {
                 const parts = input.split('/');
@@ -520,7 +536,6 @@
                 }
             }
 
-            // Validate
             if (!isValidIp(ip)) {
                 showSubnetError('invalid IP address');
                 return;
@@ -531,12 +546,10 @@
                 return;
             }
 
-            // Calculate subnet information
             const ipInt = ipToInt(ip);
             const maskInt = (0xFFFFFFFF << (32 - prefix)) >>> 0;
             const networkInt = (ipInt & maskInt) >>> 0;
             const broadcastInt = (networkInt | ~maskInt) >>> 0;
-            const wildcardInt = ~maskInt >>> 0;
             
             const totalHosts = Math.pow(2, 32 - prefix);
             const usableHosts = prefix === 32 ? 1 : (prefix === 31 ? 2 : totalHosts - 2);
@@ -544,7 +557,7 @@
             const networkIp = intToIp(networkInt);
             const broadcastIp = intToIp(broadcastInt);
             const subnetMask = intToIp(maskInt);
-            const wildcardMask = intToIp(wildcardInt);
+            const wildcardMask = intToIp((~maskInt) >>> 0);
             
             const firstUsableIp = prefix === 32 ? networkIp : (prefix === 31 ? networkIp : intToIp(networkInt + 1));
             const lastUsableIp = prefix === 32 ? networkIp : (prefix === 31 ? broadcastIp : intToIp(broadcastInt - 1));
@@ -552,7 +565,6 @@
             const ipClass = getNetworkClass(parseInt(ip.split('.')[0]));
             const isPrivate = isPrivateIp(networkIp);
 
-            // Hex conversions
             const inputHex = intToHex(ipInt);
             const networkHex = intToHex(networkInt);
             const broadcastHex = intToHex(broadcastInt);
@@ -588,32 +600,22 @@
             const resultsDiv = document.getElementById('subnetResults');
             
             let html = '<div class="result-grid">';
-            
-            // Top row - Input information
             html += createResultBox('input', data.inputCidr);
             html += createResultBox('input ip', data.inputIp);
             html += createResultBox('input long', data.inputLong);
             html += createResultBox('input hex', data.inputHex);
-            
             html += '</div><div class="result-grid">';
-            
-            // Second row - CIDR information
             html += createResultBox('cidr', data.cidr);
             html += createResultBox('cidr ip range', data.cidrIpRange);
             html += createResultBox('cidr long range', data.cidrLongRange);
             html += createResultBox('cidr hex range', data.cidrHexRange);
-            
             html += '</div><div class="result-grid">';
-            
-            // Third row - Mask and range information
             html += createResultBox('ips in range', data.ipsInRange.toLocaleString());
             html += createResultBox('mask bits', data.maskBits);
             html += createResultBox('subnet mask', data.subnetMask);
             html += createResultBox('hex subnet mask', data.hexSubnetMask);
-            
             html += '</div>';
 
-            // Additional details
             html += '<div class="result-section">';
             html += '<h3>network information</h3>';
             html += createResultItem('network address', data.networkAddress);
@@ -632,17 +634,14 @@
             html += '<h3>additional information</h3>';
             html += createResultItem('ip class', data.ipClass, false);
             html += createResultItem('ip type', data.isPrivate ? 'private' : 'public', false);
-            
             html += '<div class="result-item" style="flex-direction: column; align-items: flex-start;">';
             html += '<span class="result-label">binary subnet mask</span>';
             html += '<span class="subnet-binary">' + data.maskBinary + '</span>';
             html += '</div>';
-            
             html += '<div class="result-item" style="flex-direction: column; align-items: flex-start;">';
             html += '<span class="result-label">network address (binary)</span>';
             html += '<span class="subnet-binary">' + data.networkBinary + '</span>';
             html += '</div>';
-            
             html += '</div>';
 
             resultsDiv.innerHTML = html;
@@ -701,7 +700,6 @@
             errorDiv.style.display = 'none';
             resultsDiv.style.display = 'none';
 
-            // Validate IPs
             if (!isValidIp(startIp)) {
                 showCIDRError('invalid starting IP address');
                 return;
@@ -719,7 +717,6 @@
                 return;
             }
 
-            // Calculate CIDR blocks
             const cidrBlocks = calculateCIDRBlocks(startInt, endInt);
 
             if (cidrBlocks.length === 0) {
@@ -737,12 +734,10 @@
             while (current <= end) {
                 let maxSize = 32;
                 
-                // Find the largest block that starts at current and doesn't exceed end
                 for (let size = 0; size <= 32; size++) {
                     const blockSize = Math.pow(2, 32 - size);
                     const blockEnd = current + blockSize - 1;
                     
-                    // Check if this block fits
                     if (current % blockSize === 0 && blockEnd <= end) {
                         maxSize = size;
                     } else {
@@ -768,21 +763,18 @@
             
             let html = '<div class="result-section">';
             html += '<h3>cidr results</h3>';
-            
             html += '<div class="result-item">';
             html += '<span class="result-label">total ip addresses</span>';
             html += '<span class="result-value">' + totalIps.toLocaleString() + '</span>';
             html += '</div>';
-
             html += '<div class="result-item">';
             html += '<span class="result-label">number of cidr blocks</span>';
             html += '<span class="result-value">' + cidrBlocks.length + '</span>';
             html += '</div>';
-
             html += '<div class="result-item" style="flex-direction: column; align-items: flex-start; padding: 1rem 0;">';
             html += '<span class="result-label" style="margin-bottom: 0.75rem;">cidr notation</span>';
             
-            cidrBlocks.forEach((block, index) => {
+            cidrBlocks.forEach((block) => {
                 const cidr = block.network + '/' + block.prefix;
                 html += '<div style="display: flex; justify-content: space-between; width: 100%; margin-bottom: 0.5rem;">';
                 html += '<span class="result-value" style="font-family: monospace;">' + cidr + '</span>';
@@ -793,8 +785,7 @@
                 html += '</svg></button></div>';
             });
             
-            html += '</div>';
-            html += '</div>';
+            html += '</div></div>';
 
             resultsDiv.innerHTML = html;
             resultsDiv.style.display = 'block';
@@ -813,25 +804,7 @@
             document.getElementById('cidrResults').style.display = 'none';
         }
 
-        // SHARED FUNCTIONS
-        function copyToClipboard(text) {
-            navigator.clipboard.writeText(text).then(() => {
-                showToast('copied to clipboard');
-            }).catch(err => {
-                showToast('failed to copy');
-            });
-        }
-
-        function showToast(message) {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.classList.add('show');
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 2000);
-        }
-
-        // Allow Enter key to trigger calculation
+        // Enter key support
         document.getElementById('ipAddress').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') calcSubnet();
         });
