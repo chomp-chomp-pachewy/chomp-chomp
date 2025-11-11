@@ -52,6 +52,37 @@
       outline: none;
       border-color: #fe0032;
     }
+       .info-section2 {
+            margin-top: 20px;
+            padding: 30px;
+            background-color: #F2F2F4;
+            color: #000000;
+            border-radius: 8px;
+            border: 1px solid #434343;
+            margin-bottom: 40px;
+        }
+
+        .info-section2 strong {
+            color: #fe0032;
+            font-weight: 400;
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1em;
+            text-transform: lowercase;
+        }
+
+        .info-section2 p {
+            margin: 0 0 15px 0;
+            color: #000000;
+            font-weight: 300;
+            line-height: 1.8;
+            font-size: 0.95em;
+        }
+
+        .info-section2 p:last-child {
+            margin-bottom: 0;
+        }
+
     textarea {
       width: 100%;
       height: 200px;
@@ -146,6 +177,16 @@
   </div>
 
   <div class="container">
+<div class="info-section2">
+    <strong>about this encoder & decoder</strong>
+    <p>This tool helps you transform text into different encoded formats or decode it back again. It’s handy for developers, analysts, or anyone working with web data, files, or security tokens.</p>
+
+    <strong>encoding & decoding</strong>
+    <p>Use options like <em>encode URI</em>, <em>base64</em>, <em>hex</em>, or <em>binary</em> to safely convert text for URLs, data storage, or transmission. You can also decode them to reveal the original content. Encoding keeps information intact across systems that might not handle special characters well.</p>
+
+    <strong>hashing functions</strong>
+    <p>Hashing (like <em>SHA-256</em>) converts text into a fixed-length digital fingerprint. It can’t be reversed, making it useful for verifying data integrity or securely storing passwords without exposing the original text.</p>
+</div>    
     <div class="section-title">select encoding type</div>
 <select id="encodeType">
   <option value="">select encoding type...</option>
