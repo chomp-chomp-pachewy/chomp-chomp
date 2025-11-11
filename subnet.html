@@ -842,34 +842,42 @@ function isPrivateIpv6(ip) {
             resultsDiv.style.display = 'block';
         }
 
-        function createResultBox(label, value) {
-            let html = '<div class="result-box">';
-            html += '<div class="result-box-label">' + label + '</div>';
-            html += '<div class="result-box-value">';
-            html += '<span>' + value + '</span>';
-            html += '<button class="copy-btn" onclick="copyToClipboard(\'' + String(value).replace(/'/g, "\\'") + '\')" title="copy to clipboard">';
-            html += '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">';
-            html += '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>';
-            html += '<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>';
-            html += '</svg></button>';
-            html += '</div></div>';
-            return html;
-        }
+  function createResultBox(label, value) {
+    // 1. Stringify the value for safe use within the onclick attribute
+    const safeValue = JSON.stringify(String(value)); 
 
-        function createResultItem(label, value, showCopy = true) {
-            let html = '<div class="result-item">';
-            html += '<span class="result-label">' + label + '</span>';
-            html += '<span class="result-value">' + value;
-            if (showCopy) {
-                html += '<button class="copy-btn" onclick="copyToClipboard(\'' + value + '\')" title="copy to clipboard">';
-                html += '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">';
-                html += '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>';
-                html += '<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>';
-                html += '</svg></button>';
-            }
-            html += '</span></div>';
-            return html;
-        }
+    let html = '<div class="result-box">';
+    html += '<div class="result-box-label">' + label + '</div>';
+    html += '<div class="result-box-value">';
+    html += '<span>' + value + '</span>';
+    // 2. Use safeValue in the onclick handler instead of the complex String(value).replace()
+    html += '<button class="copy-btn" onclick="copyToClipboard(' + safeValue + ')" title="copy to clipboard">';
+    html += '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">';
+    html += '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>';
+    html += '<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>';
+    html += '</svg></button>';
+    html += '</div></div>';
+    return html;
+}
+
+function createResultItem(label, value, showCopy = true) {
+    let html = '<div class="result-item">';
+    html += '<span class="result-label">' + label + '</span>';
+    html += '<span class="result-value">' + value;
+    if (showCopy) {
+        // 1. Stringify the value for safe use within the onclick attribute
+        const safeValue = JSON.stringify(String(value));
+        
+        // 2. Use safeValue in the onclick handler
+        html += '<button class="copy-btn" onclick="copyToClipboard(' + safeValue + ')" title="copy to clipboard">';
+        html += '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">';
+        html += '<rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>';
+        html += '<path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>';
+        html += '</svg></button>';
+    }
+    html += '</span></div>';
+    return html;
+}
 
         function showSubnetError(message) {
             const errorDiv = document.getElementById('subnetError');
