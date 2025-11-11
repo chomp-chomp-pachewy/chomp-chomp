@@ -354,9 +354,9 @@
             <div class="section-title">subnet calculator</div>
             
             <div class="form-group">
-                <label for="ipAddress">ip address / cidr</label>
+                <label for="ipAddress">ipv4 or ipv6 address / cidr</label>
                 <div class="input-row">
-                    <input type="text" id="ipAddress" placeholder="e.g., 192.168.1.0/24 or 192.168.1.0">
+                    <input type="text" id="ipAddress" placeholder="e.g., 192.168.1.0/24 or 192.168.1.0 or 2001:db8:1::1 or 2001:db8:1::1/64">
                     <select id="subnetMask">
                         <option value="">select mask (optional)</option>
                         <option value="32">/32 - 255.255.255.255</option>
@@ -574,6 +574,7 @@ function calcSubnet() {
         showSubnetError('Invalid IP address format. Must be IPv4 (e.g., 192.0.2.1) or IPv6 (e.g., 2001:db8::1).');
         return;
     }
+    document.getElementById('copySubnetBtnContainer').style.display = 'block';
 }
 
         // Original IPv4 calculation logic
