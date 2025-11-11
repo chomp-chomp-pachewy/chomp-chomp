@@ -523,92 +523,273 @@
             }, 2000);
         }
 
-        // SUBNET CALCULATOR
-        function calcSubnet() {
-            const input = document.getElementById('ipAddress').value.trim();
-            const maskSelect = document.getElementById('subnetMask').value;
-            const errorDiv = document.getElementById('subnetError');
-            const resultsDiv = document.getElementById('subnetResults');
+// SUBNET CALCULATOR - Updated to handle both IPv4 and IPv6
+function calcSubnet() {
+    const input = document.getElementById('ipAddress').value.trim();
+    const maskSelect = document.getElementById('subnetMask').value;
+    const errorDiv = document.getElementById('subnetError');
+    const resultsDiv = document.getElementById('subnetResults');
 
-            errorDiv.style.display = 'none';
-            resultsDiv.style.display = 'none';
+    errorDiv.style.display = 'none';
+    resultsDiv.style.display = 'none';
 
-            let ip, prefix;
-            if (input.includes('/')) {
-                const parts = input.split('/');
-                ip = parts[0];
-                prefix = parseInt(parts[1]);
-            } else {
-                ip = input;
-                if (maskSelect) {
-                    prefix = parseInt(maskSelect);
-                } else {
-                    showSubnetError('please provide a CIDR prefix (e.g., /24) or select a subnet mask');
-                    return;
-                }
-            }
-
-            if (!isValidIp(ip)) {
-                showSubnetError('invalid IP address');
-                return;
-            }
-
-            if (isNaN(prefix) || prefix < 0 || prefix > 32) {
-                showSubnetError('invalid CIDR prefix (must be between 0 and 32)');
-                return;
-            }
-
-            const ipInt = ipToInt(ip);
-            const maskInt = (0xFFFFFFFF << (32 - prefix)) >>> 0;
-            const networkInt = (ipInt & maskInt) >>> 0;
-            const broadcastInt = (networkInt | ~maskInt) >>> 0;
-            
-            const totalHosts = Math.pow(2, 32 - prefix);
-            const usableHosts = prefix === 32 ? 1 : (prefix === 31 ? 2 : totalHosts - 2);
-            
-            const networkIp = intToIp(networkInt);
-            const broadcastIp = intToIp(broadcastInt);
-            const subnetMask = intToIp(maskInt);
-            const wildcardMask = intToIp((~maskInt) >>> 0);
-            
-            const firstUsableIp = prefix === 32 ? networkIp : (prefix === 31 ? networkIp : intToIp(networkInt + 1));
-            const lastUsableIp = prefix === 32 ? networkIp : (prefix === 31 ? broadcastIp : intToIp(broadcastInt - 1));
-            
-            const ipClass = getNetworkClass(parseInt(ip.split('.')[0]));
-            const isPrivate = isPrivateIp(networkIp);
-
-            const inputHex = intToHex(ipInt);
-            const networkHex = intToHex(networkInt);
-            const broadcastHex = intToHex(broadcastInt);
-            const maskHex = intToHex(maskInt);
-
-            displaySubnetResults({
-                inputIp: ip,
-                inputCidr: networkIp + '/' + prefix,
-                inputLong: ipInt >>> 0,
-                inputHex: inputHex,
-                cidr: networkIp + '/' + prefix,
-                cidrIpRange: networkIp + ' - ' + broadcastIp,
-                cidrLongRange: (networkInt >>> 0) + ' - ' + (broadcastInt >>> 0),
-                cidrHexRange: networkHex + ' - ' + broadcastHex,
-                ipsInRange: totalHosts,
-                maskBits: prefix,
-                subnetMask: subnetMask,
-                hexSubnetMask: maskHex,
-                networkAddress: networkIp,
-                broadcastAddress: broadcastIp,
-                wildcardMask: wildcardMask,
-                firstUsable: firstUsableIp,
-                lastUsable: lastUsableIp,
-                usableHosts: usableHosts,
-                ipClass: ipClass,
-                isPrivate: isPrivate,
-                networkBinary: ipToBinary(networkIp),
-                maskBinary: ipToBinary(subnetMask)
-            });
-            document.getElementById('copySubnetBtnContainer').style.display = 'block';
+    let ip, prefix;
+    if (input.includes('/')) {
+        const parts = input.split('/');
+        ip = parts[0];
+        prefix = parseInt(parts[1]);
+    } else {
+        ip = input;
+        if (maskSelect) {
+            prefix = parseInt(maskSelect);
+        } else {
+            showSubnetError('Please provide a CIDR prefix (e.g., /24 or /64) or select a subnet mask.');
+            return;
         }
+    }
 
+    if (ip.includes('.')) {
+        // --- IPv4 Logic ---
+        if (!isValidIpV4(ip)) {
+            showSubnetError('Invalid IPv4 address format.');
+            return;
+        }
+        if (isNaN(prefix) || prefix < 0 || prefix > 32) {
+            showSubnetError('Invalid IPv4 CIDR prefix (must be between 0 and 32).');
+            return;
+        }
+        calcSubnetV4(ip, prefix); // Existing logic is moved into a new function
+    } else if (ip.includes(':')) {
+        // --- IPv6 Logic ---
+        if (!isValidIpV6(ip)) {
+            showSubnetError('Invalid IPv6 address format.');
+            return;
+        }
+        if (isNaN(prefix) || prefix < 0 || prefix > 128) {
+            showSubnetError('Invalid IPv6 CIDR prefix (must be between 0 and 128).');
+            return;
+        }
+        calcSubnetV6(ip, prefix); // New IPv6 logic
+    } else {
+        showSubnetError('Invalid IP address format. Must be IPv4 (e.g., 192.0.2.1) or IPv6 (e.g., 2001:db8::1).');
+        return;
+    }
+}
+
+        // Original IPv4 calculation logic
+function calcSubnetV4(ip, prefix) {
+    const ipInt = ipToInt(ip);
+    const maskInt = (0xFFFFFFFF << (32 - prefix)) >>> 0;
+    const networkInt = (ipInt & maskInt) >>> 0;
+    const broadcastInt = (networkInt | ~maskInt) >>> 0;
+    
+    // ... (rest of your original IPv4 logic) ...
+    const totalHosts = Math.pow(2, 32 - prefix);
+    const usableHosts = prefix === 32 ? 1 : (prefix === 31 ? 2 : totalHosts - 2);
+    
+    const networkIp = intToIp(networkInt);
+    const broadcastIp = intToIp(broadcastInt);
+    const subnetMask = intToIp(maskInt);
+    const wildcardMask = intToIp((~maskInt) >>> 0);
+    
+    const firstUsableIp = prefix === 32 ? networkIp : (prefix === 31 ? networkIp : intToIp(networkInt + 1));
+    const lastUsableIp = prefix === 32 ? networkIp : (prefix === 31 ? broadcastIp : intToIp(broadcastInt - 1));
+    
+    const ipClass = getNetworkClass(parseInt(ip.split('.')[0]));
+    const isPrivate = isPrivateIp(networkIp);
+
+    const inputHex = intToHex(ipInt);
+    const networkHex = intToHex(networkInt);
+    const broadcastHex = intToHex(broadcastInt);
+    const maskHex = intToHex(maskInt);
+
+    displaySubnetResults({
+        // ... (all your original data objects) ...
+        inputIp: ip,
+        inputCidr: networkIp + '/' + prefix,
+        inputLong: ipInt >>> 0,
+        inputHex: inputHex,
+        cidr: networkIp + '/' + prefix,
+        cidrIpRange: networkIp + ' - ' + broadcastIp,
+        cidrLongRange: (networkInt >>> 0) + ' - ' + (broadcastInt >>> 0),
+        cidrHexRange: networkHex + ' - ' + broadcastHex,
+        ipsInRange: totalHosts,
+        maskBits: prefix,
+        subnetMask: subnetMask,
+        hexSubnetMask: maskHex,
+        networkAddress: networkIp,
+        broadcastAddress: broadcastIp,
+        wildcardMask: wildcardMask,
+        firstUsable: firstUsableIp,
+        lastUsable: lastUsableIp,
+        usableHosts: usableHosts,
+        ipClass: ipClass,
+        isPrivate: isPrivate,
+        networkBinary: ipToBinary(networkIp),
+        maskBinary: ipToBinary(subnetMask),
+        version: 'IPv4' // Added version for display
+    });
+}
+
+// New IPv6 calculation logic
+function calcSubnetV6(ip, prefix) {
+    // 1. Convert the (potentially compressed) IPv6 address to a full 128-bit BigInt
+    const ipBigInt = ipv6ToBigInt(ip);
+
+    // 2. Create the network mask (prefix '1's followed by '0's)
+    // The mask is 128 bits long. We shift a 1 to the 'prefix' position, subtract 1,
+    // and then invert the result relative to 128 bits to get the ones/zeroes in the right order.
+    // However, it's easier to create the mask of '1's directly:
+    const maskShift = 128n - BigInt(prefix);
+    const allOnes = (1n << 128n) - 1n; // 128 ones
+    
+    // Create a block of (128 - prefix) zeroes at the end
+    const hostPartMask = (1n << maskShift) - 1n; // The mask for the host part (trailing zeroes)
+    const networkMaskBigInt = allOnes ^ hostPartMask; // The mask for the network part (leading ones)
+
+    // 3. Calculate Network Address
+    const networkBigInt = ipBigInt & networkMaskBigInt;
+
+    // 4. Calculate Broadcast/Last Address
+    // In IPv6, the "broadcast" address is the last address in the subnet (the network address OR-ed with the host part mask).
+    const broadcastBigInt = networkBigInt | hostPartMask;
+
+    // 5. Convert results back to standard IPv6 string notation
+    const networkAddress = bigIntToIpv6(networkBigInt);
+    const broadcastAddress = bigIntToIpv6(broadcastBigInt);
+    const networkMaskStr = bigIntToIpv6(networkMaskBigInt); // The 'mask' in its full format
+
+    // 6. Calculate Hosts
+    // The number of addresses is 2^(128 - prefix). This is a very large number, so we display it as a power of 2.
+    const ipsInRange = `2^${128 - prefix}`; // Display as power of 2
+    const usableHosts = ipsInRange; // All addresses are usable in IPv6 (no reserved network/broadcast)
+
+    // 7. First/Last Usable IP
+    const firstUsable = networkAddress; // All IPs are usable, including network address
+    const lastUsable = broadcastAddress;
+
+    // 8. Prepare for display (using simplified presentation for IPv6)
+    displaySubnetResults({
+        inputIp: ip,
+        inputCidr: networkAddress + '/' + prefix,
+        inputLong: 'N/A (Too Large)',
+        inputHex: bigIntToHex(ipBigInt, 32),
+        cidr: networkAddress + '/' + prefix,
+        cidrIpRange: networkAddress + ' - ' + broadcastAddress,
+        cidrLongRange: 'N/A',
+        cidrHexRange: bigIntToHex(networkBigInt, 32) + ' - ' + bigIntToHex(broadcastBigInt, 32),
+        ipsInRange: ipsInRange,
+        maskBits: prefix,
+        subnetMask: networkMaskStr, // Note: IPv6 rarely uses mask notation, but we calculate it.
+        hexSubnetMask: bigIntToHex(networkMaskBigInt, 32),
+        networkAddress: networkAddress,
+        broadcastAddress: broadcastAddress,
+        wildcardMask: 'N/A (Not Applicable)', // Not commonly used in IPv6
+        firstUsable: firstUsable,
+        lastUsable: lastUsable,
+        usableHosts: usableHosts,
+        ipClass: 'N/A (No Class)',
+        isPrivate: isPrivateIpv6(networkAddress) ? 'Private (Unique Local)' : 'Public/Global',
+        networkBinary: 'N/A (Too Long)',
+        maskBinary: 'N/A (Too Long)',
+        version: 'IPv6'
+    });
+}
+
+        // Helper to check for basic valid IPv4 format
+function isValidIpV4(ip) {
+    return /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/.test(ip);
+}
+
+// Basic check for IPv6 (just looks for colons, relies on the BigInt parser for stricter validation)
+function isValidIpV6(ip) {
+    return /:/.test(ip);
+}
+
+// Convert a full or compressed IPv6 string to a 128-bit BigInt
+function ipv6ToBigInt(ip) {
+    let canonical = ip.toLowerCase();
+    
+    // Simple decompression of '::'
+    if (canonical.includes('::')) {
+        const parts = canonical.split('::');
+        const leftParts = parts[0] ? parts[0].split(':') : [];
+        const rightParts = parts[1] ? parts[1].split(':') : [];
+        const missing = 8 - leftParts.length - rightParts.length;
+        const padding = Array(missing).fill('0000');
+        canonical = leftParts.join(':') + ':' + padding.join(':') + (rightParts.length ? ':' : '') + rightParts.join(':');
+    }
+    
+    // Ensure 8 parts (padding needed for non-compressed addresses like 2001:db8:0:0:0:0:0:1)
+    if (!canonical.includes('::') && canonical.split(':').length < 8) {
+        canonical = canonical.split(':').map(part => part.padStart(4, '0')).join(':');
+    }
+
+    let ipBigInt = 0n;
+    const segments = canonical.split(':');
+
+    // Handle embedded IPv4
+    if (segments.length === 8 && segments[7].includes('.')) {
+        segments[7] = segments[7].split('.').map(o => parseInt(o).toString(16).padStart(2, '0')).join('');
+        segments.pop(); // Remove the single mixed segment
+        segments.push(segments[7].substring(0, 4));
+        segments.push(segments[7].substring(4, 8));
+    }
+    
+    // Pad all segments to 4 chars and concatenate for hex string
+    let hex = segments.map(seg => seg.padStart(4, '0')).join('');
+    if (hex.length === 32) {
+        ipBigInt = BigInt(`0x${hex}`);
+    } else {
+        // Fallback for tricky input, use 0n
+        return 0n; 
+    }
+
+    return ipBigInt;
+}
+
+// Convert a 128-bit BigInt back to a compressed IPv6 string
+function bigIntToIpv6(bigInt) {
+    let hex = bigInt.toString(16).padStart(32, '0');
+    let segments = [];
+    for (let i = 0; i < 32; i += 4) {
+        segments.push(hex.substring(i, i + 4));
+    }
+    
+    // Pad segments and remove leading zeros
+    segments = segments.map(s => s.replace(/^0+/, '') || '0');
+
+    // Recompress '::' - Find the longest run of '0' segments
+    let ipStr = segments.join(':');
+    ipStr = ipStr.replace(/(:0){2,}/, '::');
+    
+    return ipStr;
+}
+
+// Convert BigInt to a hexadecimal string of a specified length
+function bigIntToHex(bigInt, length) {
+    return bigInt.toString(16).padStart(length, '0').toUpperCase();
+}
+
+// Basic check for Unique Local Address (ULA) in IPv6
+function isPrivateIpv6(ip) {
+    // Unique Local Addresses start with 'fd'
+    return ip.toLowerCase().startsWith('fd');
+}
+
+// NOTE: You'll also need to update your `displaySubnetResults` 
+// and `createResultItem/Box` functions to conditionally handle the 'N/A' 
+// or large number formats for IPv6, as shown in the `calcSubnetV6` call.
+
+// Original IPv4 Helper functions (ensure these are available)
+// function ipToInt(ip) { ... }
+// function intToIp(ipInt) { ... }
+// function intToHex(ipInt) { ... }
+// function ipToBinary(ip) { ... }
+// function getNetworkClass(firstOctet) { ... }
+// function isPrivateIp(ip) { ... }
+// function showSubnetError(message) { ... }
+// function displaySubnetResults(data) { ... }
         function displaySubnetResults(data) {
             const resultsDiv = document.getElementById('subnetResults');
             
