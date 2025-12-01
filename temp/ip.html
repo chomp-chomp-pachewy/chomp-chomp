@@ -23,6 +23,7 @@
     <div class="page-container">
         <div class="tool-page">
             <div class="tool-header">
+                <img src="https://raw.githubusercontent.com/chomp-chomp-pachewy/chomp-chomp/refs/heads/main/whatisyourip.png" alt="your ip" style="max-width: 300px; margin: 0 auto 20px; display: block;">
                 <h1 class="tool-title">Your IP Address</h1>
                 <p class="tool-subtitle">Find your IP address, location & network information</p>
             </div>
@@ -42,37 +43,93 @@
             </div>
 
             <div class="tool-results" id="results" style="display: none;">
+                <h3 style="margin-bottom: 15px; color: var(--color-text);">IP Address Information</h3>
                 <div class="result-item">
                     <div class="result-label">IP Address</div>
                     <div class="result-value" id="ip">-</div>
-                </div>
-                <div class="result-item">
-                    <div class="result-label">IP Version</div>
-                    <div class="result-value" id="version">-</div>
-                </div>
-                <div class="result-item">
-                    <div class="result-label">Country</div>
-                    <div class="result-value" id="country">-</div>
-                </div>
-                <div class="result-item">
-                    <div class="result-label">Region</div>
-                    <div class="result-value" id="region">-</div>
                 </div>
                 <div class="result-item">
                     <div class="result-label">City</div>
                     <div class="result-value" id="city">-</div>
                 </div>
                 <div class="result-item">
+                    <div class="result-label">State/Region</div>
+                    <div class="result-value" id="region">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Postal Code</div>
+                    <div class="result-value" id="postal">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Country</div>
+                    <div class="result-value" id="country">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Coordinates</div>
+                    <div class="result-value" id="coordinates">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Time Zone</div>
+                    <div class="result-value" id="timezone">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Local Time</div>
+                    <div class="result-value" id="localtime">-</div>
+                </div>
+                <div class="result-item">
                     <div class="result-label">ISP</div>
                     <div class="result-value" id="isp">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Domain</div>
+                    <div class="result-value" id="domain">-</div>
                 </div>
                 <div class="result-item">
                     <div class="result-label">Organization</div>
                     <div class="result-value" id="org">-</div>
                 </div>
                 <div class="result-item">
-                    <div class="result-label">Timezone</div>
-                    <div class="result-value" id="timezone">-</div>
+                    <div class="result-label">ASN</div>
+                    <div class="result-value" id="asn">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Network IP Range</div>
+                    <div class="result-value" id="network">-</div>
+                </div>
+            </div>
+
+            <div class="tool-results" id="whoisResults" style="display: none; margin-top: 20px;">
+                <h3 style="margin-bottom: 15px; color: var(--color-text);">IP Address WHOIS</h3>
+                <div class="result-item" style="border-bottom: none;">
+                    <textarea id="whoisData" readonly style="width: 100%; min-height: 300px; font-family: 'Courier New', monospace; font-size: 0.85em; line-height: 1.6; padding: 15px; background-color: var(--color-bg); border: 1px solid var(--color-border); border-radius: 8px; color: var(--color-text);">Loading WHOIS data...</textarea>
+                </div>
+            </div>
+
+            <div class="tool-results" id="browserDetails" style="display: none; margin-top: 20px;">
+                <h3 style="margin-bottom: 15px; color: var(--color-text);">Additional Details</h3>
+                <div class="result-item">
+                    <div class="result-label">User Agent</div>
+                    <div class="result-value" id="userAgent" style="word-break: break-word;">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Screen Resolution</div>
+                    <div class="result-value" id="screenRes">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Browser Language</div>
+                    <div class="result-value" id="browserLang">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Platform</div>
+                    <div class="result-value" id="platform">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Cookies Enabled</div>
+                    <div class="result-value" id="cookies">-</div>
+                </div>
+                <div class="result-item">
+                    <div class="result-label">Do Not Track</div>
+                    <div class="result-value" id="dnt">-</div>
                 </div>
             </div>
 
@@ -142,20 +199,106 @@
                     return;
                 }
 
+                // Populate IP information
                 document.getElementById('ip').textContent = data.ip || '-';
-                document.getElementById('version').textContent = data.version || '-';
-                document.getElementById('country').textContent = `${data.country_name || '-'} (${data.country_code || '-'})`;
-                document.getElementById('region').textContent = data.region || '-';
                 document.getElementById('city').textContent = data.city || '-';
-                document.getElementById('isp').textContent = data.org || '-';
-                document.getElementById('org').textContent = data.org || '-';
-                document.getElementById('timezone').textContent = data.timezone || '-';
+                document.getElementById('region').textContent = data.region || '-';
+                document.getElementById('postal').textContent = data.postal || '-';
+                document.getElementById('country').textContent = `${data.country_code || '-'}`;
 
+                // Format coordinates
+                const lat = data.latitude || '-';
+                const lon = data.longitude || '-';
+                document.getElementById('coordinates').textContent = lat !== '-' && lon !== '-' ? `${lat}, ${lon}` : '-';
+
+                // Format timezone with UTC offset
+                const tz = data.timezone || '-';
+                const utcOffset = data.utc_offset || '';
+                document.getElementById('timezone').textContent = utcOffset ? `UTC ${utcOffset}` : tz;
+
+                // Format local time
+                const now = new Date();
+                const localTimeStr = now.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    year: 'numeric',
+                    month: 'short',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                document.getElementById('localtime').textContent = localTimeStr;
+
+                document.getElementById('isp').textContent = data.org || '-';
+                document.getElementById('domain').textContent = data.ip || '-';
+                document.getElementById('org').textContent = data.org || '-';
+                document.getElementById('asn').textContent = data.asn || '-';
+
+                // Format network range
+                const network = data.network || '-';
+                document.getElementById('network').textContent = network !== '-' ? `${network} (${data.ip || ''})` : '-';
+
+                // Display results
                 document.getElementById('results').style.display = 'block';
+
+                // Fetch and display WHOIS data
+                fetchWHOIS(currentIP);
+
+                // Display browser/system details
+                displayBrowserDetails();
+
             } catch (error) {
                 alert('Error fetching IP details. Please try again.');
                 console.error('Error:', error);
             }
+        }
+
+        // Fetch WHOIS data
+        async function fetchWHOIS(ip) {
+            try {
+                // Note: WHOIS API may require authentication or have rate limits
+                // Using a simulated WHOIS response or try ipapi.co whois endpoint
+                const response = await fetch(`https://ipapi.co/${ip}/json/`);
+                const data = await response.json();
+
+                // Format WHOIS-like output
+                let whoisText = `#\n# WHOIS data for ${ip}\n#\n\n`;
+                whoisText += `NetRange:       ${data.network || 'N/A'}\n`;
+                whoisText += `CIDR:           ${data.network || 'N/A'}\n`;
+                whoisText += `NetName:        ${data.org || 'N/A'}\n`;
+                whoisText += `Organization:   ${data.org || 'N/A'}\n`;
+                whoisText += `ASN:            ${data.asn || 'N/A'}\n`;
+                whoisText += `Country:        ${data.country_name || 'N/A'} (${data.country_code || 'N/A'})\n`;
+                whoisText += `Region:         ${data.region || 'N/A'}\n`;
+                whoisText += `City:           ${data.city || 'N/A'}\n`;
+                whoisText += `Postal:         ${data.postal || 'N/A'}\n`;
+                whoisText += `Timezone:       ${data.timezone || 'N/A'}\n`;
+                whoisText += `Coordinates:    ${data.latitude || 'N/A'}, ${data.longitude || 'N/A'}\n\n`;
+                whoisText += `OrgName:        ${data.org || 'N/A'}\n`;
+                whoisText += `OrgTechEmail:   N/A\n`;
+                whoisText += `OrgTechPhone:   N/A\n\n`;
+                whoisText += `# Additional information may be available from regional registries\n`;
+                whoisText += `# (ARIN, RIPE, APNIC, LACNIC, AFRINIC)\n`;
+
+                document.getElementById('whoisData').value = whoisText;
+                document.getElementById('whoisResults').style.display = 'block';
+            } catch (error) {
+                document.getElementById('whoisData').value = 'Unable to fetch WHOIS data';
+                document.getElementById('whoisResults').style.display = 'block';
+                console.error('WHOIS error:', error);
+            }
+        }
+
+        // Display browser and system details
+        function displayBrowserDetails() {
+            document.getElementById('userAgent').textContent = navigator.userAgent || '-';
+            document.getElementById('screenRes').textContent = `${screen.width} x ${screen.height}` || '-';
+            document.getElementById('browserLang').textContent = navigator.language || '-';
+            document.getElementById('platform').textContent = navigator.platform || '-';
+            document.getElementById('cookies').textContent = navigator.cookieEnabled ? 'yes' : 'no';
+            document.getElementById('dnt').textContent = navigator.doNotTrack || '0';
+
+            document.getElementById('browserDetails').style.display = 'block';
         }
 
         // Copy IP to clipboard

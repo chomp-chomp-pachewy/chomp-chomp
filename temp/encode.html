@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Encode - Chomp Tools</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/tools-recipes-style.css">
+</head>
+<body>
+    <header class="site-header">
+        <nav class="site-nav">
+            <a href="https://www.chomp.ltd" class="site-logo">chomp chomp</a>
+            <button class="menu-toggle" aria-label="Toggle menu">☰</button>
+            <ul class="nav-links">
+                <li><a href="https://www.chomp.ltd">home</a></li>
+                <li><a href="https://recipes.chomp.ltd">recipes</a></li>
+                <li><a href="https://tools.chomp.ltd">tools</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <div class="page-container">
+        <div class="tool-page">
+            <div class="tool-header">
+                <img src="https://raw.githubusercontent.com/chomp-chomp-pachewy/chomp-chomp/refs/heads/main/encode.png" alt="encode" style="max-width: 300px; margin: 0 auto 20px; display: block;">
+                <h1 class="tool-title">Encode & Decode</h1>
+                <p class="tool-subtitle">Transform text with URI, Base64, Hex, Binary & Hash functions</p>
+            </div>
+
+            <div class="info-box">
+                <p><strong>About this encoder & decoder:</strong> This tool helps you transform text into different encoded formats or decode it back again. It's handy for developers, analysts, or anyone working with web data, files, or security tokens.</p>
+                <p><strong>Encoding & Decoding:</strong> Use options like encode URI, base64, hex, or binary to safely convert text for URLs, data storage, or transmission. You can also decode them to reveal the original content.</p>
+                <p><strong>Hashing functions:</strong> Hashing (like SHA-256) converts text into a fixed-length digital fingerprint. It can't be reversed, making it useful for verifying data integrity or securely storing passwords.</p>
+            </div>
+
+            <div class="tool-controls">
+                <div class="control-group">
+                    <label class="control-label">Select Encoding Type</label>
+                    <select id="encodeType" class="form-select">
+                        <option value="">Select encoding type...</option>
+                        <option value="encodeURI">Encode URI</option>
+                        <option value="decodeURI">Decode URI</option>
+                        <option value="base64Encode">Base64 Encode</option>
+                        <option value="base64Decode">Base64 Decode</option>
+                        <option value="hexEncode">Hex Encode</option>
+                        <option value="hexDecode">Hex Decode</option>
+                        <option value="binaryEncode">Binary Encode</option>
+                        <option value="binaryDecode">Binary Decode</option>
+                        <option value="sha256Hash">SHA-256 Hash</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Input</label>
+                    <textarea id="input" class="control-input" placeholder="Enter text here..." style="min-height: 150px;"></textarea>
+                </div>
+
+                <div class="tool-actions">
+                    <button class="tool-button" onclick="processEncode()">Process</button>
+                    <button class="tool-button tool-button-secondary" onclick="clearFields()">Clear</button>
+                </div>
+            </div>
+
+            <div class="tool-results">
+                <div class="control-group">
+                    <label class="control-label">Output</label>
+                    <textarea id="output" class="control-input" readonly placeholder="Output will appear here..." style="min-height: 150px;"></textarea>
+                </div>
+
+                <div class="tool-actions">
+                    <button class="tool-button tool-button-secondary" onclick="copyOutput()">Copy Output</button>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 40px;">
+                <a href="index.html" class="btn btn-outline">← Back to Tools</a>
+            </div>
+        </div>
+    </div>
+
+    <footer class="site-footer">
+        <div class="footer-content">
+            <p>&copy; 2024 Chomp Chomp. All rights reserved.</p>
+            <div class="footer-links">
+                <a href="mailto:tools@chomp.ltd">Contact</a>
+                <a href="https://www.chomp.ltd">Home</a>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Mobile menu toggle
+        const menuToggle = document.querySelector('.menu-toggle');
+        const navLinks = document.querySelector('.nav-links');
+
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.site-nav')) {
+                navLinks.classList.remove('active');
+            }
+        });
+
+        // Encoding functions
+        const input = document.getElementById('input');
+        const output = document.getElementById('output');
+        const encodeType = document.getElementById('encodeType');
+
+        function processEncode() {
+            const selectedType = encodeType.value;
+            if (!selectedType) {
+                alert('Please select an encoding type');
+                return;
+            }
+
+            const functions = {
+                'encodeURI': encodeURIComp,
+                'decodeURI': decodeURIComp,
+                'base64Encode': base64Encode,
+                'base64Decode': base64Decode,
+                'hexEncode': hexEncode,
+                'hexDecode': hexDecode,
+                'binaryEncode': binaryEncode,
+                'binaryDecode': binaryDecode,
+                'sha256Hash': sha256Hash
+            };
+
+            if (functions[selectedType]) {
+                functions[selectedType]();
+            }
+        }
+
+        function encodeURIComp() {
+            try {
+                output.value = encodeURIComponent(input.value);
+            } catch (e) {
+                output.value = 'Error encoding text';
+            }
+        }
+
+        function decodeURIComp() {
+            try {
+                output.value = decodeURIComponent(input.value);
+            } catch (e) {
+                output.value = 'Error decoding text';
+            }
+        }
+
+        function base64Encode() {
+            try {
+                output.value = btoa(input.value);
+            } catch (e) {
+                output.value = 'Error encoding Base64';
+            }
+        }
+
+        function base64Decode() {
+            try {
+                output.value = atob(input.value);
+            } catch (e) {
+                output.value = 'Error decoding Base64';
+            }
+        }
+
+        function hexEncode() {
+            try {
+                output.value = Array.from(input.value)
+                    .map(char => char.charCodeAt(0).toString(16).padStart(2, '0'))
+                    .join('');
+            } catch (e) {
+                output.value = 'Error encoding to hex';
+            }
+        }
+
+        function hexDecode() {
+            try {
+                const hex = input.value.replace(/\s/g, '');
+                if (hex.length % 2 !== 0) {
+                    output.value = 'Invalid hex string (odd length)';
+                    return;
+                }
+                output.value = hex.match(/.{1,2}/g)
+                    .map(byte => String.fromCharCode(parseInt(byte, 16)))
+                    .join('');
+            } catch (e) {
+                output.value = 'Error decoding hex';
+            }
+        }
+
+        function binaryEncode() {
+            try {
+                output.value = Array.from(input.value)
+                    .map(char => char.charCodeAt(0).toString(2).padStart(8, '0'))
+                    .join(' ');
+            } catch (e) {
+                output.value = 'Error encoding to binary';
+            }
+        }
+
+        function binaryDecode() {
+            try {
+                const binary = input.value.replace(/\s/g, '');
+                if (binary.length % 8 !== 0) {
+                    output.value = 'Invalid binary string (length must be multiple of 8)';
+                    return;
+                }
+                output.value = binary.match(/.{1,8}/g)
+                    .map(byte => String.fromCharCode(parseInt(byte, 2)))
+                    .join('');
+            } catch (e) {
+                output.value = 'Error decoding binary';
+            }
+        }
+
+        async function sha256Hash() {
+            try {
+                const msgBuffer = new TextEncoder().encode(input.value);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                output.value = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+            } catch (e) {
+                output.value = 'Error generating SHA-256 hash';
+            }
+        }
+
+        function clearFields() {
+            input.value = '';
+            output.value = '';
+            encodeType.selectedIndex = 0;
+        }
+
+        function copyOutput() {
+            output.select();
+            navigator.clipboard.writeText(output.value).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = 'Copied!';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                }, 2000);
+            }).catch(err => {
+                alert('Failed to copy');
+            });
+        }
+    </script>
+</body>
+</html>
