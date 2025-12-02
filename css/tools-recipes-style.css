@@ -101,6 +101,27 @@ img {
   gap: var(--spacing-lg);
 }
 
+/* Three-column header layout */
+.header-left {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+
+.header-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+}
+
 .site-logo {
   font-size: 1.6em;
   font-weight: 500;
@@ -150,18 +171,16 @@ img {
   opacity: 1;
 }
 
-/* Header banner image (below nav, centered like recipes site) */
+/* Header banner image (centered in nav) */
 .header-banner {
   display: block;
   max-width: 600px;
   max-height: 135px;
   height: auto;
-  margin: var(--spacing-md) auto 0;
-  text-align: center;
 }
 
 .header-banner img {
-  max-height: 90px;
+  max-height: 135px;
   width: auto;
   object-fit: contain;
 }
