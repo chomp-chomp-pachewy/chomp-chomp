@@ -451,14 +451,14 @@ p {
 
 /* Tool header images on tool pages */
 .tool-page .tool-header img {
-  max-height: 200px;
+  max-height: 300px;
   width: auto;
   object-fit: contain;
 }
 
 /* Hero image on index page */
 .tools-index .tool-header img {
-  max-height: 200px;
+  max-height: 300px;
   width: auto;
   object-fit: contain;
 }
@@ -709,23 +709,34 @@ textarea.control-input {
     padding: var(--spacing-md);
   }
 
+  .site-nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--spacing-md);
+  }
+
   /* Mobile icon size */
   .site-logo img {
-    max-height: 25px;
+    max-height: 50px;
   }
 
   /* Mobile hero image on index page */
   .tools-index .tool-header img {
-    max-height: 155px;
+    max-height: 200px;
   }
 
   /* Mobile tool header images on tool pages */
   .tool-page .tool-header img {
-    max-height: 155px;
+    max-height: 200px;
   }
 
   .menu-toggle {
     display: block;
+    font-size: 2em;
+    min-width: 50px;
+    min-height: 50px;
+    flex-shrink: 0;
   }
 
   .nav-tools-dropdown {
