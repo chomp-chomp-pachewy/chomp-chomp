@@ -454,6 +454,7 @@ p {
   max-height: 300px;
   width: auto;
   object-fit: contain;
+  border-radius: 12px;
 }
 
 /* Hero image on index page */
@@ -461,6 +462,7 @@ p {
   max-height: 300px;
   width: auto;
   object-fit: contain;
+  border-radius: 12px;
 }
 
 .tool-title {
